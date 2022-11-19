@@ -1,0 +1,7 @@
+/.vscode
+/unit-17.6-hw/bin
+/unit-17.6-hw/obj
+*.csproj
+*.json
+*.dll
+*.pdb
