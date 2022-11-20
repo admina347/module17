@@ -1,13 +1,18 @@
 ﻿namespace Unit_17_6;
-public abstract class Account
-{
-    public Account(string type, double balance, double interest)
-    {
-        Type = type;
-        Balance = balance;
-        Interest = interest;
-    }
 
+/* 
+Напишите свой вариант рефакторинга кода из задания 4 в соответствии с Принципом открытости-закрытости.
+
+Иначе говоря, вы должны проектировать классы так, чтобы при необходимости их можно было легко дополнить 
+(то есть оставлять задел на будущее, возможности для масштабирования и роста функционала).
+
+
+Если код из задания 4 действительно нужно рефакторить, то с чего бы вы начали?
+1 Реализовать общий интерфейс для всех аккаунтов с методом CalculateInterest()
+2 через этот интерфейс потом будут передаваться конкретные реализации аккаунтов в класс Calculator */
+
+public class Account
+{
     // тип учетной записи
     public string Type { get; set; }
 
@@ -16,19 +21,11 @@ public abstract class Account
 
     // процентная ставка
     public double Interest { get; set; }
-
-    public void CalculateInterest(ICalculator calculator)
-    {
-        calculator.CalculateInterest(this);
-    }
 }
 
-/// <summary>
-/// Интерфейс с общим функционалом
-/// </summary>
 public interface ICalculator
 {
-    void CalculateInterest(Account account);
+    public void CalculateInterest(Account account);
 }
 
 public class Calculator
@@ -39,15 +36,12 @@ public class Calculator
     }
 }
 
-public class BaseAccount : Account, ICalculator
+public class BaseCalculator : ICalculator
 {
-    public BaseAccount(string type, double balance, double interest) : base(type, balance, interest)
-    {
-    }
-
+    // Метод для расчета процентной ставки
     public void CalculateInterest(Account account)
     {
-        Console.WriteLine("Aккаунт:" + account.Type);
+        Console.WriteLine(">> Загружен профиль: Базовый <<");
         // расчет процентной ставки обычного аккаунта по правилам банка
         account.Interest = account.Balance * 0.4;
 
@@ -56,31 +50,40 @@ public class BaseAccount : Account, ICalculator
 
         if (account.Balance < 50000)
             account.Interest -= account.Balance * 0.4;
-        Console.WriteLine("Ставка: " + account.Interest);
     }
 }
 
-public class SalaryAccount : Account, ICalculator
+public class SalaryCalculator : ICalculator
 {
-    public SalaryAccount(string type, double balance, double interest) : base(type, balance, interest)
-    {
-    }
-
+    // Метод для расчета процентной ставки
     public void CalculateInterest(Account account)
     {
-        Console.WriteLine("Аккаунт:" + account.Type);
+        Console.WriteLine(">> Загружен профиль: Зарплатный <<");
+        // расчет процентной ставк зарплатного аккаунта по правилам банка
         account.Interest = account.Balance * 0.5;
-        Console.WriteLine("Ставка: " + account.Interest);
     }
 }
-
-
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Новый список аккаунтов
+        Account account = new Account();
+        account.Balance = 10000;
+        account.Type = "Обычный";
+        account.Interest = 0;
+
+        var calculator = new Calculator();
+
+        calculator.CalculateInterest(new BaseCalculator(), account);
+
+        Console.WriteLine();
+
+        calculator.CalculateInterest(new SalaryCalculator(), account);
+    }
+}
+
+/* // Новый список аккаунтов
         var accountList = new List<Account>()
         {
             new BaseAccount("Обычный", 5000, 0),
@@ -89,43 +92,4 @@ class Program
             new SalaryAccount("Зарплатный", 15000, 0),
             new SalaryAccount("Зарплатный", 20000, 0),
             new SalaryAccount("Зарплатный", 25000, 0)
-        };
-        //accountList[0].CalculateInterest(Account.)
-        // Считаем ставки
-        //ICalculator calculator = new Account();
-        //FlightPassengerCount(accountList);
-        //foreach (var a in accountList)
-        //a.CalculateInterest(a.Balance);
-
-        /* ICalculator calculator = new BaseAccount();
-        var account = new Account("Обычный", 5000, 0);
-        calculator.CalculateInterest(account);
-        Console.WriteLine(); */
-
-        /* var calculator = new Calculator();
-        var account = new Account("Обычный", 5000, 0);  
-        // посадка на землю
-        calculator.CalculateInterest(new BaseAccount(), account);
-        Console.WriteLine(); */
-
-        //account.CalculateInterest(new SalaryAccount());
-        //Account ac = new BaseAccount();
-        //ac.Type = "необычный";
-        //ac.CalculateInterest(calculator);
-        //
-        //calculator.CalculateInterest();
-        //  Document doc = new Document();
-        //  doc.Text = "Hello World";
-        //  doc.Export(exporter);
-
-        var calculator = new Calculator();
-        foreach (var a in accountList)
-            calculator.CalculateInterest(a);
-
-    }
-    //public static void FlightPassengerCount(List<Account> accounts)
-    //{
-    //    foreach (var a in accounts)
-    //        a.CalculateInterest(a);
-    //}
-}
+        }; */
