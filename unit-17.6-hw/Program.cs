@@ -11,56 +11,65 @@
 1 Реализовать общий интерфейс для всех аккаунтов с методом CalculateInterest()
 2 через этот интерфейс потом будут передаваться конкретные реализации аккаунтов в класс Calculator */
 
-public class Account
+public interface IAccount
 {
-    // тип учетной записи
-    public string Type { get; set; }
+    public void CalculateInterest();
+    public void Print();
+}
+
+public static class Calculator
+{
+    public static void CalculateInterest(IAccount account)
+    {
+        account.CalculateInterest();
+    }
+}
+public abstract class Account
+{
+    protected Account(double balance, double interest)
+    {
+        Balance = balance;
+        Interest = interest;
+    }
 
     // баланс учетной записи
     public double Balance { get; set; }
 
     // процентная ставка
     public double Interest { get; set; }
-}
-
-public interface ICalculator
-{
-    public void CalculateInterest(Account account);
-}
-
-public class Calculator
-{
-    public void CalculateInterest(ICalculator calculator, Account account)
+    public void Print()
     {
-        calculator.CalculateInterest(account);
+        Console.WriteLine("Процентная ставка: " + Interest);
     }
 }
-
-public class BaseCalculator : ICalculator
+public class Ordinary : Account, IAccount
 {
-    // Метод для расчета процентной ставки
-    public void CalculateInterest(Account account)
+    public Ordinary(double balance, double interest) : base(balance, interest)
     {
-        Console.WriteLine(">> Загружен профиль: Базовый <<");
+    }
+
+    public void CalculateInterest()
+    {
         // расчет процентной ставки обычного аккаунта по правилам банка
-        account.Interest = account.Balance * 0.4;
+        Interest = Balance * 0.4;
+        if (Balance < 1000)
+            Interest -= Balance * 0.2;
 
-        if (account.Balance < 1000)
-            account.Interest -= account.Balance * 0.2;
-
-        if (account.Balance < 50000)
-            account.Interest -= account.Balance * 0.4;
+        if (Balance < 50000)
+            Interest -= Balance * 0.4;
     }
 }
 
-public class SalaryCalculator : ICalculator
+public class Salary : Account, IAccount
 {
-    // Метод для расчета процентной ставки
-    public void CalculateInterest(Account account)
+    public Salary(double balance, double interest) : base(balance, interest)
     {
-        Console.WriteLine(">> Загружен профиль: Зарплатный <<");
+    }
+
+    public void CalculateInterest()
+    {
         // расчет процентной ставк зарплатного аккаунта по правилам банка
-        account.Interest = account.Balance * 0.5;
+        Interest = Balance * 0.5;
     }
 }
 
@@ -68,28 +77,28 @@ class Program
 {
     static void Main(string[] args)
     {
-        Account account = new Account();
-        account.Balance = 10000;
-        account.Type = "Обычный";
+        /* var account = new Ordinary();
+        account.Balance = 60000;
         account.Interest = 0;
+        account.CalculateInterest();
+        account.Print(); */
 
-        var calculator = new Calculator();
+        // Новый список аккаунтов
+        var accountList = new List<IAccount>()
+        {
+            new Ordinary(5000, 0),
+            new Ordinary(10000, 0),
+            new Ordinary(15000, 0),
+            new Salary(15000, 0),
+            new Salary(20000, 0),
+            new Salary(25000, 0)
+        };
 
-        calculator.CalculateInterest(new BaseCalculator(), account);
-
-        Console.WriteLine();
-
-        calculator.CalculateInterest(new SalaryCalculator(), account);
+        foreach (var a in accountList)
+        {
+            a.CalculateInterest();
+            a.Print();
+        }
     }
 }
 
-/* // Новый список аккаунтов
-        var accountList = new List<Account>()
-        {
-            new BaseAccount("Обычный", 5000, 0),
-            new BaseAccount("Обычный", 10000, 0),
-            new BaseAccount("Обычный", 15000, 0),
-            new SalaryAccount("Зарплатный", 15000, 0),
-            new SalaryAccount("Зарплатный", 20000, 0),
-            new SalaryAccount("Зарплатный", 25000, 0)
-        }; */
