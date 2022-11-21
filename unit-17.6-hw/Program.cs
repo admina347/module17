@@ -9,7 +9,7 @@ class Program
         {
             new Ordinary(5000, 0),
             new Ordinary(10000, 0),
-            new Ordinary(15000, 0),
+            new Ordinary(60000, 0),
             new Salary(15000, 0),
             new Salary(20000, 0),
             new Salary(25000, 0)
